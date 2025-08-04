@@ -1,28 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+    
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Price Calculator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
 
-<div>
-  <h1>How much to charge?</h1>
-  <p>If you were a freelance web designer, how much should you charge for a website? Fill out the form and find out!</p>
-</div>
+<body class="bg-light">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white text-center">
+            <h1 class="card-title mb-0">How much to charge?</h1>
+          </div>
+          <div class="card-body">
+            <p class="card-text text-muted mb-4">
+              If you were a freelance web designer, how much should you charge for a website? Fill out the form and find out!
+            </p>
+            
+            <form id="budget" action="javascript:calculatePrice()">
+              <div class="mb-3">
+                <label for="salary" class="form-label">What annual salary seems suitable for you?</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="salary" name="salary" placeholder="65000" required>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <label for="days" class="form-label">How many days do you think it will take you to make the website?</label>
+                <input type="number" class="form-control" id="days" name="days" placeholder="10" required>
+              </div>
+              
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Calculate your price!</button>
+              </div>
+              
+              <div class="mt-4 text-center">
+                <div class="alert alert-success d-none" id="priceResult" role="alert">
+                  <h4 class="alert-heading">Your recommended price:</h4>
+                  <p class="mb-0 fs-3 fw-bold" id="finalPrice">???</p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div>
-  <form id="budget" action="javascript:calculatePrice()">
-    <label for="salary">What annual salary seems suitable for you?</label>
-    <input type="text" id="salary" name="salary"/><br><br>
-    <label for="days">How many days do you think it will take you to make the website?</label>
-    <input type="text" id="days" name="days"/><br><br>
-    <input type="submit" value="Calculate your price!"><br><br>
-    <label id="finalPrice"> ??? </label>
-  </form>
-</div>
-
-
-<script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
   function calculatePrice() {
     var s = document.getElementById("salary").value;
     var d = document.getElementById("days").value;
@@ -35,6 +69,5 @@
     document.getElementById("finalPrice").innerHTML = finalPrice;
   }
   </script>
-
 </body>
 </html>
