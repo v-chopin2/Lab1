@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-    
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Price Calculator</title>
+
   <!-- Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body class="bg-light">
   <div class="container mt-5">
     <div class="row justify-content-center">
@@ -25,28 +24,24 @@
             <form id="budget" action="javascript:calculatePrice()">
               <div class="mb-3">
                 <label for="salary" class="form-label">What annual salary seems suitable for you?</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" id="salary" name="salary" placeholder="65000" required>
-                </div>
+                <input type="text" class="form-control" id="salary" name="salary"/>
               </div>
               
               <div class="mb-4">
                 <label for="days" class="form-label">How many days do you think it will take you to make the website?</label>
-                <input type="number" class="form-control" id="days" name="days" placeholder="10" required>
+                <input type="text" class="form-control" id="days" name="days"/>
               </div>
               
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary btn-lg">Calculate your price!</button>
+              <div class="d-grid mb-4">
+                <input type="submit" class="btn btn-primary btn-lg" value="Calculate your price!">
               </div>
               
-              <div class="mt-4 text-center">
-                <div class="alert alert-success d-none" id="priceResult" role="alert">
-                  <h4 class="alert-heading">Your recommended price:</h4>
-                  <p class="mb-0 fs-3 fw-bold" id="finalPrice">???</p>
-                </div>
+              <div class="text-center">
+                <label id="finalPrice" class="fs-3 fw-bold text-success">???</label>
               </div>
             </form>
+
+            <img src="../img/scot-flag.jpg" />
           </div>
         </div>
       </div>
@@ -55,19 +50,6 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-  
-  <script>
-  function calculatePrice() {
-    var s = document.getElementById("salary").value;
-    var d = document.getElementById("days").value;
-    console.log("Calculating price")
-    console.log(s)
-    console.log(d)
-    let finalPrice = 0;
-    dailyRate = s/365;
-    finalPrice = dailyRate * d;
-    document.getElementById("finalPrice").innerHTML = finalPrice;
-  }
-  </script>
+  <script src="../js/app.js"></script>
 </body>
 </html>
