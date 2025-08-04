@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Price Calculator</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white text-center">
+            <h1 class="card-title mb-0">How much to charge?</h1>
+          </div>
+          <div class="card-body">
+            <p class="card-text text-muted mb-4">
+              If you were a freelance web designer, how much should you charge for a website? Fill out the form and find out!
+            </p>
+            
+            <form id="budget" action="javascript:calculatePrice()">
+              <div class="mb-3">
+                <label for="salary" class="form-label">What annual salary seems suitable for you?</label>
+                <input type="text" class="form-control" id="salary" name="salary"/>
+              </div>
+              
+              <div class="mb-4">
+                <label for="days" class="form-label">How many days do you think it will take you to make the website?</label>
+                <input type="text" class="form-control" id="days" name="days"/>
+              </div>
+              
+              <div class="d-grid mb-4">
+                <input type="submit" class="btn btn-primary btn-lg" value="Calculate your price!">
+              </div>
+              
+              <div class="text-center">
+                <label id="finalPrice" class="fs-3 fw-bold text-success">???</label>
+              </div>
+            </form>
+
+            <img src="../img/scot-flag.jpg" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- App JS -->
+  <script src="../js/app.js"></script>
+</body>
+</html>

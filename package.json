@@ -1,0 +1,23 @@
+{
+  "name": "price-calculator-server",
+  "version": "1.0.0",
+  "description": "A Node.js server for the freelance price calculator website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "express",
+    "web-server",
+    "price-calculator"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
