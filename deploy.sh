@@ -24,13 +24,13 @@ echo "4. Passage dans le dossier $PROD_DIR..."
 cd $PROD_DIR || { echo "Erreur : Répertoire $PROD_DIR introuvable"; exit 1; }
  
 echo "5. Arrêt des conteneurs existants..."
-sudo docker compose down
+sudo docker-compose down
  
 echo "5. Mise à jour du tag dans le docker-compose.yml..."
 sudo sed -i.bak -E "s|image: $IMAGE_NAME:.*|image: $IMAGE_NAME:$TAG|" "$COMPOSE_FILE"
  
 echo "6. Redémarrage des conteneurs avec le nouveau tag..."
-sudo docker compose up -d
+sudo docker-compose up -d
  
 echo "Déploiement terminé avec l'image : $IMAGE_NAME:$TAG"
  
