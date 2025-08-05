@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const connectDB = require('./config/database');
-const TestData = require('../Lab1/src/public/models/testData');//require('../src/public/models/TestData');
+const TestData = require('./src/public/models/testData');//require('../src/public/models/TestData');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
