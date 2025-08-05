@@ -1,8 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const connectDB = require('./config/database');
+const TestData = require('../Lab1/src/public/models/testData');//require('../src/public/models/TestData');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+// Connect to MongoDB
+connectDB();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -14,6 +20,26 @@ app.use(express.static(path.join(__dirname, 'src', 'public')));
 // Route for the main page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
+});
+
+// Simple test endpoint to check DB connection
+app.get('/api/test', async (req, res) => {
+    try {
+        const testData = new TestData({ message: 'Database connection test!' });
+        await testData.save();
+        
+        res.json({
+            success: true,
+            message: 'Database connected and working!',
+            data: testData
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Database error',
+            error: error.message
+        });
+    }
 });
 
 // API endpoint to calculate price
