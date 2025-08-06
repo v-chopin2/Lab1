@@ -5,7 +5,7 @@ const connectDB = require('./config/database');
 const TestData = require('./src/public/models/testData');//require('../src/public/models/TestData');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB
 connectDB();
