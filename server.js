@@ -129,7 +129,9 @@ app.get('/api/users/:id', async (req, res) => {
 // POST create new user
 app.post('/api/users', async (req, res) => {
     try {
-        const { name, email, age } = req.body;
+        const { name, email, age, phone } = req.body;
+        
+        console.log('Received data:', { name, email, age, phone });
         
         if (!name || !email) {
             return res.status(400).json({
@@ -138,7 +140,8 @@ app.post('/api/users', async (req, res) => {
             });
         }
 
-        const user = new User({ name, email, age });
+        const user = new User({ name, email, age, phone });
+        console.log('User before save:', user);
         await user.save();
         
         res.status(201).json({
@@ -164,11 +167,11 @@ app.post('/api/users', async (req, res) => {
 // PUT update user
 app.put('/api/users/:id', async (req, res) => {
     try {
-        const { name, email, age } = req.body;
+        const { name, email, age, phone } = req.body;
         
         const user = await User.findByIdAndUpdate(
             req.params.id,
-            { name, email, age },
+            { name, email, age, phone },
             { new: true, runValidators: true }
         );
         
