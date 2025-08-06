@@ -3,7 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/database');
-const TestData = require('./src/public/models/testData');//require('../src/public/models/TestData');
+const TestData = require('./src/public/models/testData');
+const User = require('./src/public/models/User');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -79,6 +80,147 @@ app.post('/api/calculate', (req, res) => {
         console.error('Error calculating price:', error);
         res.status(500).json({ 
             error: 'Server error while calculating price.' 
+        });
+    }
+});
+
+// User CRUD endpoints
+
+// GET all users
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json({
+            success: true,
+            data: users
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching users',
+            error: error.message
+        });
+    }
+});
+
+// GET user by ID
+app.get('/api/users/:id', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        res.json({
+            success: true,
+            data: user
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user',
+            error: error.message
+        });
+    }
+});
+
+// POST create new user
+app.post('/api/users', async (req, res) => {
+    try {
+        const { name, email, age } = req.body;
+        
+        if (!name || !email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name and email are required'
+            });
+        }
+
+        const user = new User({ name, email, age });
+        await user.save();
+        
+        res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            data: user
+        });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email already exists'
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Error creating user',
+            error: error.message
+        });
+    }
+});
+
+// PUT update user
+app.put('/api/users/:id', async (req, res) => {
+    try {
+        const { name, email, age } = req.body;
+        
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { name, email, age },
+            { new: true, runValidators: true }
+        );
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: 'User updated successfully',
+            data: user
+        });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email already exists'
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Error updating user',
+            error: error.message
+        });
+    }
+});
+
+// DELETE user
+app.delete('/api/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: 'User deleted successfully',
+            data: user
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting user',
+            error: error.message
         });
     }
 });
