@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 const connectDB = require('./config/database');
 const TestData = require('./src/public/models/testData');
 const User = require('./src/public/models/User');
@@ -14,15 +16,201 @@ connectDB();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.auth_token;
+    
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
+    }
+    
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(400).json({ success: false, message: 'Invalid token.' });
+    }
+};
+
+// Authentication endpoints
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { name, email, password, age, phone } = req.body;
+        
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name, email, and password are required'
+            });
+        }
+        
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+        
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+        
+        const user = new User({ name, email, password, age, phone });
+        await user.save();
+        
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
+        
+        res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+        
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                age: user.age,
+                phone: user.phone
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error registering user',
+            error: error.message
+        });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
+        }
+        
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+        
+        const isPasswordValid = await user.comparePassword(password);
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+        
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
+        
+        res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+        
+        res.json({
+            success: true,
+            message: 'Login successful',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                age: user.age,
+                phone: user.phone
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error during login',
+            error: error.message
+        });
+    }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+    res.clearCookie('auth_token');
+    res.json({
+        success: true,
+        message: 'Logout successful'
+    });
+});
+
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user data',
+            error: error.message
+        });
+    }
+});
+
 // Route for the main page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'src', 'public', 'index.html'));
+});
+
+// Protected test endpoint (requires authentication)
+app.get('/api/protected-test', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('name email');
+        res.json({
+            success: true,
+            message: 'Welcome to the protected area!',
+            user: user,
+            timestamp: new Date().toISOString(),
+            secretData: 'This is sensitive information only for authenticated users'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error accessing protected resource',
+            error: error.message
+        });
+    }
 });
 
 // Simple test endpoint to check DB connection
@@ -87,9 +275,9 @@ app.post('/api/calculate', (req, res) => {
 // User CRUD endpoints
 
 // GET all users
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authenticateToken, async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password');
         res.json({
             success: true,
             data: users
@@ -104,9 +292,9 @@ app.get('/api/users', async (req, res) => {
 });
 
 // GET user by ID
-app.get('/api/users/:id', async (req, res) => {
+app.get('/api/users/:id', authenticateToken, async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select('-password');
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -127,27 +315,35 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // POST create new user
-app.post('/api/users', async (req, res) => {
+app.post('/api/users', authenticateToken, async (req, res) => {
     try {
-        const { name, email, age, phone } = req.body;
+        const { name, email, password, age, phone } = req.body;
         
         console.log('Received data:', { name, email, age, phone });
         
-        if (!name || !email) {
+        if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Name and email are required'
+                message: 'Name, email, and password are required'
             });
         }
 
-        const user = new User({ name, email, age, phone });
+        const user = new User({ name, email, password, age, phone });
         console.log('User before save:', user);
         await user.save();
         
         res.status(201).json({
             success: true,
             message: 'User created successfully',
-            data: user
+            data: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                age: user.age,
+                phone: user.phone,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            }
         });
     } catch (error) {
         if (error.code === 11000) {
@@ -165,7 +361,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 // PUT update user
-app.put('/api/users/:id', async (req, res) => {
+app.put('/api/users/:id', authenticateToken, async (req, res) => {
     try {
         const { name, email, age, phone } = req.body;
         
@@ -203,7 +399,7 @@ app.put('/api/users/:id', async (req, res) => {
 });
 
 // DELETE user
-app.delete('/api/users/:id', async (req, res) => {
+app.delete('/api/users/:id', authenticateToken, async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         

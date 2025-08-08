@@ -21,6 +21,89 @@
               If you were a freelance web designer, how much should you charge for a website? Fill out the form and find out!
             </p>
             
+            <!-- Authentication Section -->
+            <div id="authSection" class="mb-4">
+              <div id="loginForm" class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">Login Required</h5>
+                </div>
+                <div class="card-body">
+                  <form id="loginFormElement" action="javascript:loginUser()">
+                    <div class="mb-3">
+                      <label for="loginEmail" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="loginEmail" required/>
+                    </div>
+                    <div class="mb-3">
+                      <label for="loginPassword" class="form-label">Password</label>
+                      <input type="password" class="form-control" id="loginPassword" required/>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button type="submit" class="btn btn-primary">Login</button>
+                      <button type="button" class="btn btn-outline-secondary" onclick="showRegisterForm()">Register</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              
+              <div id="registerForm" class="card" style="display: none;">
+                <div class="card-header">
+                  <h5 class="mb-0">Register</h5>
+                </div>
+                <div class="card-body">
+                  <form id="registerFormElement" action="javascript:registerUser()">
+                    <div class="mb-3">
+                      <label for="registerName" class="form-label">Name</label>
+                      <input type="text" class="form-control" id="registerName" required/>
+                    </div>
+                    <div class="mb-3">
+                      <label for="registerEmail" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="registerEmail" required/>
+                    </div>
+                    <div class="mb-3">
+                      <label for="registerPassword" class="form-label">Password (min 6 characters)</label>
+                      <input type="password" class="form-control" id="registerPassword" minlength="6" required/>
+                    </div>
+                    <div class="mb-3">
+                      <label for="registerAge" class="form-label">Age (optional)</label>
+                      <input type="number" class="form-control" id="registerAge"/>
+                    </div>
+                    <div class="mb-3">
+                      <label for="registerPhone" class="form-label">Phone (optional)</label>
+                      <input type="tel" class="form-control" id="registerPhone"/>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button type="submit" class="btn btn-success">Register</button>
+                      <button type="button" class="btn btn-outline-secondary" onclick="showLoginForm()">Back to Login</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- User Welcome Section -->
+            <div id="userWelcome" class="alert alert-success" style="display: none;">
+              <div class="d-flex justify-content-between align-items-center">
+                <span>Welcome, <span id="userName"></span>!</span>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="logoutUser()">Logout</button>
+              </div>
+            </div>
+
+            <!-- Protected Test Section -->
+            <div id="protectedSection" style="display: none;">
+              <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                  <h5 class="mb-0">🔒 Protected Area</h5>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted">This section is only visible to authenticated users.</p>
+                  <button class="btn btn-outline-success" onclick="testProtectedEndpoint()">
+                    Test Protected Endpoint
+                  </button>
+                  <div id="protectedResult" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+
             <form id="budget" action="javascript:calculatePrice()">
               <div class="mb-3">
                 <label for="salary" class="form-label">What annual salary seems suitable for you?</label>
